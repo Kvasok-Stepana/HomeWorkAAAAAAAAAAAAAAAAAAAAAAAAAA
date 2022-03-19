@@ -129,18 +129,9 @@ int main() {
     bubblesort.close();
 
 
-    FILE* gnuplot_fd;
 
-    if ((gnuplot_fd = _popen("gnuplot\\bin\\gnuplot", "w")) == NULL)
-    {
-        fprintf(stderr, "Error opening pipe to gnuplot.\n");
-        exit(1);
-    }
 
-    cout << 1 <<endl;
 
-    plot( gnuplot_fd , "bubsort.txt", "BUBBLE SORT", 1);
-    plot( gnuplot_fd, "qsort.txt", "QUICK SORT", 2);
 
 
 
