@@ -62,7 +62,7 @@ int Savedata(){
 
 }
 
-void plot (FILE* gnuplot_fd, const char* filename, const char* title, int window_number)
+void plot(FILE* gnuplot_fd, const char* filename, const char* title, int window_number, bool plot_in_new_window)
 {
     string s = to_string(window_number);
 
@@ -78,6 +78,7 @@ void plot (FILE* gnuplot_fd, const char* filename, const char* title, int window
 
     fflush(gnuplot_fd);
 }
+
 void CallSort (int Num,int* Arr, int size, int i)
 {
 
@@ -129,7 +130,10 @@ int main() {
     bubblesort.close();
 
 
+    FILE* gnuplot_fd;
 
+    plot(gnuplot_fd, "bsort.txt", "BUBBLE SORT", 1, true);
+    plot(gnuplot_fd, "qsort.txt", "QUICK SORT", 2, true);
 
 
 
