@@ -1,0 +1,3 @@
+C:/Users/Сергей Северёв/CLionProjects/HomeWorkAAAAAAAAAAAAAAAAAAAAAAAAAA/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/Сергей Северёв/CLionProjects/HomeWorkAAAAAAAAAAAAAAAAAAAAAAAAAA/cmake-build-debug/CMakeFiles/HomeWorkAAAAAAAAAAAAAAAAAAAAAAAAAA.dir
+C:/Users/Сергей Северёв/CLionProjects/HomeWorkAAAAAAAAAAAAAAAAAAAAAAAAAA/cmake-build-debug/CMakeFiles/edit_cache.dir
