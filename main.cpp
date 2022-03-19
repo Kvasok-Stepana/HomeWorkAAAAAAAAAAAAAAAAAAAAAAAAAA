@@ -6,13 +6,14 @@
 #include <ctime>
 #include <fstream>
 #include <stdlib.h>
+#include <stdio.h>
 #include <conio.h>
+#include <process.h>
 
 using namespace std;
 
 void new_arr(int*& Arr,int Size)
 {
-    Arr = new int [Size];
     for (int i=0; i<Size;i++)
     {
         Arr[i]= rand()%10000;
@@ -61,31 +62,32 @@ int Savedata(){
 
 }
 
-void plot_mandel(FILE* gnuplot_fd, const char* filename, const char* title, int window_number, bool plot_in_new_window)
+void plot (FILE* gnuplot_fd, const char* filename, const char* title, int window_number)
 {
     string s = to_string(window_number);
 
-    fprintf(gnuplot_fd, "set terminal windows " );
+    fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, s.c_str());
     fprintf(gnuplot_fd, "\nset title \'");
     fprintf(gnuplot_fd, title);
     fprintf(gnuplot_fd, "\'\n");
-    fprintf(gnuplot_fd, "set xlabel \"Re\"\nset ylabel \"Im\"\n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time (us)\"\n");
     fprintf(gnuplot_fd, "plot \'");
     fprintf(gnuplot_fd, filename);
-    fprintf(gnuplot_fd, "\' using 1:2 with points pointtype 5\n");
+    fprintf(gnuplot_fd, "\' using 1:2 with linespoints\n");
 
     fflush(gnuplot_fd);
 }
 void CallSort (int Num,int* Arr, int size, int i)
 {
 
+
 }
 
 
 int main() {
 
-
+    cout <<"Start" << endl;
     int *arr ;
 
 
@@ -95,9 +97,11 @@ int main() {
     std::ofstream quicksort("qsort.txt", std::ios::out);
     std::ofstream bubblesort("bsort.txt", std::ios::out);
 
-    for (int size = 16; size < 5000000 ; size <<= 2){
+    for (int size = 16; size < 4096 ; size <<= 2){
 
-        int t=0;
+        cout << size<< endl;
+
+        float t=0;
 
         arr = new int[size];
 
@@ -107,11 +111,14 @@ int main() {
         QuickSort(arr,0,size-1);
         quicksort << GetTickCount() - t << "\n";
 
-        bubblesort << size <<  "\t" ;
-        new_arr(arr,size);
-        t = GetTickCount();
-        BubbleSort(arr,size);
-        bubblesort << GetTickCount() - t << "\n";
+
+        if(size < 40000) {
+            bubblesort << size << "\t";
+            new_arr(arr, size);
+            t = GetTickCount();
+            BubbleSort(arr, size);
+            bubblesort << GetTickCount() - t << "\n";
+        }
 
 
         delete[] arr;
@@ -121,14 +128,19 @@ int main() {
     quicksort.close();
     bubblesort.close();
 
+
     FILE* gnuplot_fd;
 
     if ((gnuplot_fd = _popen("gnuplot\\bin\\gnuplot", "w")) == NULL)
     {
-        cout << "Error opening pipe to gnuplot.";\
-        system ("pause");
-        return 0;
+        fprintf(stderr, "Error opening pipe to gnuplot.\n");
+        exit(1);
     }
+
+    cout << 1 <<endl;
+
+    plot( gnuplot_fd , "bubsort.txt", "BUBBLE SORT", 1);
+    plot( gnuplot_fd, "qsort.txt", "QUICK SORT", 2);
 
 
 
