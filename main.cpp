@@ -20,10 +20,6 @@ void new_arr(int*& Arr,int Size)
 }
 
 
-void Exit(int* Arr)
-{
-    delete[] Arr;
-}
 
 void QuickSort (int *ar, int lo, int hi)
 {
@@ -65,7 +61,26 @@ int Savedata(){
 
 }
 
+void plot_mandel(FILE* gnuplot_fd, const char* filename, const char* title, int window_number, bool plot_in_new_window)
+{
+    string s = to_string(window_number);
 
+    fprintf(gnuplot_fd, "set terminal windows " );
+    fprintf(gnuplot_fd, s.c_str());
+    fprintf(gnuplot_fd, "\nset title \'");
+    fprintf(gnuplot_fd, title);
+    fprintf(gnuplot_fd, "\'\n");
+    fprintf(gnuplot_fd, "set xlabel \"Re\"\nset ylabel \"Im\"\n");
+    fprintf(gnuplot_fd, "plot \'");
+    fprintf(gnuplot_fd, filename);
+    fprintf(gnuplot_fd, "\' using 1:2 with points pointtype 5\n");
+
+    fflush(gnuplot_fd);
+}
+void CallSort (int Num,int* Arr, int size, int i)
+{
+
+}
 
 
 int main() {
@@ -84,6 +99,7 @@ int main() {
 
         int t=0;
 
+        arr = new int[size];
 
         quicksort << size <<  "\t" ;
         new_arr(arr,size);
@@ -91,14 +107,14 @@ int main() {
         QuickSort(arr,0,size-1);
         quicksort << GetTickCount() - t << "\n";
 
-        quicksort << size <<  "\t" ;
+        bubblesort << size <<  "\t" ;
         new_arr(arr,size);
         t = GetTickCount();
         BubbleSort(arr,size);
         bubblesort << GetTickCount() - t << "\n";
 
 
-        std::cout << i << endl;
+        delete[] arr;
         i++;
     }
 
@@ -109,13 +125,14 @@ int main() {
 
     if ((gnuplot_fd = _popen("gnuplot\\bin\\gnuplot", "w")) == NULL)
     {
-        fprintf(stderr, "Error opening pipe to gnuplot.\n");
-        exit(1);
+        cout << "Error opening pipe to gnuplot.";\
+        system ("pause");
+        return 0;
     }
 
 
 
-
+    system ("pause");
 
     return 0;
 }
