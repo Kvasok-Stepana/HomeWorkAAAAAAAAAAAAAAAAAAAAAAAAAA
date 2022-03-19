@@ -7,8 +7,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <conio.h>
-#include <process.h>
+
 
 using namespace std;
 
