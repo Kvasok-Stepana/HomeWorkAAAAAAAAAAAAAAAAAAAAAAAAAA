@@ -157,13 +157,15 @@ void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char*
     fprintf(gnuplot_fd, "\nset title \'");
     fprintf(gnuplot_fd, title);
     fprintf(gnuplot_fd, "\'\n");
-    fprintf(gnuplot_fd," \n set logscale y \n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time (us)\"\n");
     fprintf(gnuplot_fd, "plot \'");
     fprintf(gnuplot_fd, filename);
     fprintf(gnuplot_fd, "\' using 1:2 with linespoints \n");
 
     fflush(gnuplot_fd);
 }
+
+
 
 void CallSort (int Num,int* Arr, int size, int i)
 {
@@ -183,7 +185,7 @@ int main() {
     int i=0;
 
 
-    std::ofstream allsort ("allsort.txt", std::ios::out);
+
     std::ofstream quicksort("qsort.txt", std::ios::out);
     std::ofstream bubblesort("bsort.txt", std::ios::out);
     std::ofstream mergesort("msort.txt", std::ios::out);
@@ -194,7 +196,6 @@ int main() {
 
         arr = new int[size];
 
-        allsort << size << "\t";
 
         quicksort << size << "\t";
         new_arr(arr, size);
@@ -203,7 +204,7 @@ int main() {
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<float> timeS = end - start;
         quicksort << timeS.count() << "\n";
-        allsort << timeS.count() << "\t";
+
                 TestArray(arr, size, "quick_sort" );
 
 
@@ -212,20 +213,22 @@ int main() {
             new_arr(arr, size);
             auto start = chrono::high_resolution_clock::now();
             BubbleSort(arr, size);
+            auto end = chrono::high_resolution_clock::now();
             chrono::duration<float> timeS = end - start;
             bubblesort << timeS.count() << "\n";
-            allsort << timeS.count() << "\t";
+
             TestArray(arr, size, "bubble_sort");
         }
 
-        if (size < 400000){
+        if (size < 500000){
             mergesort << size << "\t";
             new_arr(arr, size);
             auto start = chrono::high_resolution_clock::now();
             mergeSort(arr, 0, size - 1);
+            auto end = chrono::high_resolution_clock::now();
             chrono::duration<float> timeS = end - start;
             mergesort << timeS.count() << "\n";
-            allsort << timeS.count() << "\n";
+
             TestArray(arr, size, "merge_sort");
        }
 
@@ -239,25 +242,32 @@ int main() {
     }
 
     cout<< "Sorting finished"<< endl;
-    allsort.close();
     quicksort.close();
     bubblesort.close();
     mergesort.close();
 
-    FILE* gnuplot_fd ;
-
-    if ((gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w")) == NULL)
-    {
-        fprintf(stderr, "Error opening pipe to gnuplot.\n");
-        exit(1);
-    }
+    FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
 
 
 
-    plot(gnuplot_fd, "qsort.txt", "QUICK SORT", "1" );
-    plot(gnuplot_fd, "bsort.txt", "BUBBLE SORT", "2" );
-    plot(gnuplot_fd, "msort.txt", "MERGE SORT", "3" );
 
+    plot(gnuplot_fd, "qsort.txt", "Quick sort", "1" );
+    plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
+    plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
+
+
+    fprintf(gnuplot_fd, "set terminal windows ");
+    fprintf(gnuplot_fd, "0");
+    fprintf(gnuplot_fd, "\nset title \'");
+    fprintf(gnuplot_fd, "All sorts");
+    fprintf(gnuplot_fd, "\'\n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time (us)\"\n");
+    fprintf(gnuplot_fd," \n set logscale x \n");
+    fprintf(gnuplot_fd, "plot \"bsort.txt\" using 1:2 title \"Bubble sort\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"qsort.txt\" using 1:2 title \"Quick sort\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"msort.txt\" using 1:2 title \"Merge sort\" with linespoints\n");
+
+    fflush(gnuplot_fd);
 
 
 
