@@ -25,7 +25,7 @@
 
 using namespace std;
 
-void new_arr(int*& Arr,int Size)
+void new_arr(int* Arr,int Size)
 {
     for (int i=0; i<Size;i++)
     {
@@ -80,43 +80,52 @@ void BubbleSort (int* Arr,int Size)
     }
 }
 
-
-void merge(int* arr, int l, int m, int r)
+void merge(int arr[], int l, int m, int r)
 {
     int i, j, k;
     int n1 = m - l + 1;
     int n2 = r - m;
 
+    /* create temp arrays */
+    int* L = (int*)malloc(sizeof(int) * n1);
+    int* R = (int*)malloc(sizeof(int) * n2);
 
-    int L[n1], R[n2];
-
-
+    /* Copy data to temp arrays L[] and R[] */
     for (i = 0; i < n1; i++)
+    {
         L[i] = arr[l + i];
+    }
 
     for (j = 0; j < n2; j++)
+    {
         R[j] = arr[m + 1 + j];
+    }
 
-
+    /* Merge the temp arrays back into arr[l..r]*/
     i = 0; // Initial index of first subarray
     j = 0; // Initial index of second subarray
     k = l; // Initial index of merged subarray
-
-    while (i < n1 && j < n2) {
-        if (L[i] <= R[j]) {
+    while (i < n1 && j < n2)
+    {
+        if (L[i] <= R[j])
+        {
             arr[k] = L[i];
             i++;
         }
-        else {
+
+        else
+        {
             arr[k] = R[j];
             j++;
         }
+
         k++;
     }
 
     /* Copy the remaining elements of L[], if there
     are any */
-    while (i < n1) {
+    while (i < n1)
+    {
         arr[k] = L[i];
         i++;
         k++;
@@ -124,23 +133,30 @@ void merge(int* arr, int l, int m, int r)
 
     /* Copy the remaining elements of R[], if there
     are any */
-    while (j < n2) {
+    while (j < n2)
+    {
         arr[k] = R[j];
         j++;
         k++;
     }
+
+    free(L);
+    free(R);
 }
 
-
-void mergeSort(int* arr, int l, int r)
+void mergeSort(int* a, int r, int l)
 {
-    if (l < r) {
-
+    if (l < r)
+    {
+        // Same as (l+r)/2, but avoids overflow for
+        // large l and h
         int m = l + (r - l) / 2;
-        mergeSort(arr, l, m);
-        mergeSort(arr, m + 1, r);
 
-        merge (arr, l, m, r);
+        // Sort first and second halves
+        mergeSort(a, m, l);
+        mergeSort(a, r, m + 1);
+
+        merge(a, l, m, r);
     }
 }
 
@@ -157,7 +173,7 @@ void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char*
     fprintf(gnuplot_fd, "\nset title \'");
     fprintf(gnuplot_fd, title);
     fprintf(gnuplot_fd, "\'\n");
-    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time (us)\"\n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time \"\n");
     fprintf(gnuplot_fd, "plot \'");
     fprintf(gnuplot_fd, filename);
     fprintf(gnuplot_fd, "\' using 1:2 with linespoints \n");
@@ -194,35 +210,36 @@ int main() {
 
         cout << "Sorting (" << i + 1 << " out of 19)" << endl;
 
-        arr = new int[size];
+        arr = new int [size];
 
-
-        quicksort << size << "\t";
         new_arr(arr, size);
+        quicksort << size << "\t";
         auto start = chrono::high_resolution_clock::now();
         QuickSort(arr, 0, size - 1);
         auto end = chrono::high_resolution_clock::now();
         chrono::duration<float> timeS = end - start;
         quicksort << timeS.count() << "\n";
+        TestArray(arr, size, "quick_sort" );
 
-                TestArray(arr, size, "quick_sort" );
 
+        cout << "qsort - OK"<< endl;
 
-        if (size < 60000) {
+        if (size < 90000) {
             bubblesort << size << "\t";
-            new_arr(arr, size);
+            arr = new int[size];
             auto start = chrono::high_resolution_clock::now();
             BubbleSort(arr, size);
             auto end = chrono::high_resolution_clock::now();
             chrono::duration<float> timeS = end - start;
             bubblesort << timeS.count() << "\n";
-
             TestArray(arr, size, "bubble_sort");
+
+            cout << "bsort - OK"<< endl;
         }
 
-        if (size < 500000){
+        if (1 == 1){
             mergesort << size << "\t";
-            new_arr(arr, size);
+            arr = new int[size];
             auto start = chrono::high_resolution_clock::now();
             mergeSort(arr, 0, size - 1);
             auto end = chrono::high_resolution_clock::now();
@@ -230,6 +247,8 @@ int main() {
             mergesort << timeS.count() << "\n";
 
             TestArray(arr, size, "merge_sort");
+
+            cout << "msort - OK"<< endl;
        }
 
 
@@ -250,18 +269,18 @@ int main() {
 
 
 
-
+/*
     plot(gnuplot_fd, "qsort.txt", "Quick sort", "1" );
     plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
-
+*/
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
     fprintf(gnuplot_fd, "\nset title \'");
     fprintf(gnuplot_fd, "All sorts");
     fprintf(gnuplot_fd, "\'\n");
-    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time (us)\"\n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time\"\n");
     fprintf(gnuplot_fd," \n set logscale x \n");
     fprintf(gnuplot_fd, "plot \"bsort.txt\" using 1:2 title \"Bubble sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"qsort.txt\" using 1:2 title \"Quick sort\" with linespoints\n");
