@@ -48,31 +48,29 @@ void TestArray(int* Arr, int size, string sortname){
 
 void QuickSort (int *s_arr, int first, int last)
 {
-    {
-        if (first < last)
-        {
-            int left = first, right = last, middle = s_arr[(left + right) / 2];
-            do
-            {
-                while (s_arr[left] < middle) left++;
-                while (s_arr[right] > middle) right--;
-                if (left <= right)
-                {
-                    int tmp = s_arr[left];
-                    s_arr[left] = s_arr[right];
-                    s_arr[right] = tmp;
-                    left++;
-                    right--;
-                }
-            } while (left <= right);
-            QuickSort(s_arr, first, right);
-            QuickSort(s_arr, left, last);
-        }
-    }
 
+    if (first < last)
+    {
+        int left = first, right = last, middle = s_arr[(left + right) / 2];
+        do
+        {
+            while (s_arr[left] < middle) left++;
+            while (s_arr[right] > middle) right--;
+            if (left <= right)
+            {
+                int tmp = s_arr[left];
+                s_arr[left] = s_arr[right];
+                s_arr[right] = tmp;
+                left++;
+                right--;
+            }
+        } while (left <= right);
+        QuickSort(s_arr, first, right);
+        QuickSort(s_arr, left, last);
+    }
 }
 
-void BubbleSort (int* Arr,int Size)
+void BubbleSort (int* Arr,int nul, int Size)
 {
     Size++;
 
@@ -135,8 +133,9 @@ void mergeSort(int *array, int l, int r) {
     }
 }
 
-void insertionSort(int arr[], int n)
+void insertionSort(int* arr,int nul, int n)
 {
+    n++;
     int i, key, j;
     for (i = 1; i < n; i++) {
         key = arr[i];
@@ -153,8 +152,9 @@ void insertionSort(int arr[], int n)
     }
 }
 
-void SelectionSort(int arr[], int n)
+void SelectionSort(int* arr,int nul, int n)
 {
+    n++;
     int i, j, min_idx;
 
     // One by one move boundary of unsorted subarray
@@ -170,6 +170,10 @@ void SelectionSort(int arr[], int n)
         swap(arr[min_idx], arr[i]);
     }
 }
+
+
+
+
 
 
 void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
@@ -189,6 +193,15 @@ void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char*
     fflush(gnuplot_fd);
 }
 
+void (*sortind [5])(int*, int, int) ;
+
+
+
+
+
+
+
+
 
 int main() {
 
@@ -197,13 +210,27 @@ int main() {
     int *arr ;
     int i=0;
 
+    sortind[0] = QuickSort ;
+    sortind[1] = BubbleSort;
+    sortind[2] = mergeSort;
+    sortind[3] = insertionSort;
+    sortind[4] = SelectionSort;
 
 
-    std::ofstream quicksort("qsort.txt", std::ios::out);
-    std::ofstream bubblesort("bsort.txt", std::ios::out);
-    std::ofstream mergesort("msort.txt", std::ios::out);
-    std::ofstream insort("insort.txt", std::ios::out);
-    std::ofstream selectsort("selsort.txt", std::ios::out);
+    ofstream filesort[5];
+
+    filesort[0].open  ("qsort.txt");
+    filesort[1].open ("bsort.txt");
+    filesort[2].open ("msort.txt");
+    filesort[3].open ("insort.txt");
+    filesort[4].open ("selsort.txt");
+
+
+
+
+
+    string Nameofsort [5] = {"qsort","bsort","msort","insort","selsort"};
+
 
 
     for (int size = 1024 ; size < 5000000  ; size <<= 1) {
@@ -213,104 +240,33 @@ int main() {
         arr = new int [size];
 
 
-        new_arr(arr, size);
+        for  (int sn=0 ; sn<5 ; sn++){
 
-        quicksort << size << "\t";
-
-        auto start = chrono::high_resolution_clock::now();
-        QuickSort(arr, 0, size - 1);
-        auto end = chrono::high_resolution_clock::now();
-
-        chrono::duration<float> timeS = end - start;
-        quicksort << timeS.count() << "\n";
-
-        TestArray(arr, size, "quick_sort" );
-
-        cout << "qsort - OK"<< endl;
-
-        if (size < 40000) {
-            bubblesort << size << "\t";
             new_arr(arr, size);
-            auto start = chrono::high_resolution_clock::now();
-            BubbleSort(arr, size);
-            auto end = chrono::high_resolution_clock::now();
-            chrono::duration<float> timeS = end - start;
 
-            bubblesort << timeS.count() << "\n";
-            TestArray(arr, size, "bubble_sort");
+            filesort[sn] << size << "\t";
 
-            cout << "bsort - OK"<< endl;
+            float start = clock();
+            sortind[sn](arr,0, size-1);
+            float end = clock();
 
+            float time = end - start;
+
+            filesort[sn] << time << "\n";
+
+            TestArray(arr, size, Nameofsort[sn] );
+
+            cout << Nameofsort[sn] << "-OK"<< endl;
         }
-
-        if (1==1){
-            mergesort << size << "\t";
-
-            new_arr(arr, size);
-
-            auto start = chrono::high_resolution_clock::now();
-            mergeSort(arr, 0, size - 1);
-            auto end = chrono::high_resolution_clock::now();
-
-            chrono::duration<float> timeS = end - start;
-            mergesort << timeS.count() << "\n";
-
-            TestArray(arr, size, "merge_sort");
-
-            cout << "msort - OK"<< endl;
-
-       }
-
-        if (size < 120000){
-            insort << size << "\t";
-
-            new_arr(arr, size);
-
-            auto start = chrono::high_resolution_clock::now();
-            insertionSort(arr, size );
-            auto end = chrono::high_resolution_clock::now();
-
-            chrono::duration<float> timeS = end - start;
-            insort << timeS.count() << "\n";
-
-            TestArray(arr, size, "insertion_sort");
-
-            cout << "insort - OK"<< endl;
-
-        }
-
-        if (size < 100000){
-            selectsort << size << "\t";
-
-            new_arr(arr, size);
-
-            auto start = chrono::high_resolution_clock::now();
-            SelectionSort(arr, size );
-            auto end = chrono::high_resolution_clock::now();
-
-            chrono::duration<float> timeS = end - start;
-            selectsort << timeS.count() << "\n";
-
-            TestArray(arr, size, "selection_sort");
-
-            cout << "selsort - OK"<< endl;
-
-        }
-
-
-
-
 
         delete[] arr;
         i++;
     }
 
     cout<< "Sorting finished"<< endl;
-    quicksort.close();
-    bubblesort.close();
-    mergesort.close();
-    insort.close();
-    selectsort.close();
+
+    for (int i =0; i<5 ; i++)
+        filesort[i].close();
 
     FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
 
