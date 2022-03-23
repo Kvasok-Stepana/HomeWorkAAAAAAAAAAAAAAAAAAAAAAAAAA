@@ -135,6 +135,25 @@ void mergeSort(int *array, int l, int r) {
     }
 }
 
+void insertionSort(int arr[], int n)
+{
+    int i, key, j;
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+
+        /* Move elements of arr[0..i-1], that are
+          greater than key, to one position ahead
+          of their current position */
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }
+        arr[j + 1] = key;
+    }
+}
+
+
 void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
 {
 
@@ -165,7 +184,7 @@ int main() {
     std::ofstream quicksort("qsort.txt", std::ios::out);
     std::ofstream bubblesort("bsort.txt", std::ios::out);
     std::ofstream mergesort("msort.txt", std::ios::out);
-
+    std::ofstream insort("insort.txt", std::ios::out);
     for (int size = 16; size < 5000000  ; size <<= 1) {
 
         cout << "Sorting (" << i + 1 << " out of 19)" << endl;
@@ -188,7 +207,7 @@ int main() {
 
         cout << "qsort - OK"<< endl;
 
-        if (size < 90000) {
+        if (size < 50000) {
             bubblesort << size << "\t";
             new_arr(arr, size);
             auto start = chrono::high_resolution_clock::now();
@@ -200,9 +219,10 @@ int main() {
             TestArray(arr, size, "bubble_sort");
 
             cout << "bsort - OK"<< endl;
+
         }
 
-        if (size < 5000000){
+        if (1==1){
             mergesort << size << "\t";
 
             new_arr(arr, size);
@@ -220,6 +240,24 @@ int main() {
 
        }
 
+        if (1==1){
+            insort << size << "\t";
+
+            new_arr(arr, size);
+
+            auto start = chrono::high_resolution_clock::now();
+            insertionSort(arr, size );
+            auto end = chrono::high_resolution_clock::now();
+
+            chrono::duration<float> timeS = end - start;
+            insort << timeS.count() << "\n";
+
+            TestArray(arr, size, "insertion_sort");
+
+            cout << "insort - OK"<< endl;
+
+        }
+
 
 
 
@@ -233,15 +271,15 @@ int main() {
     quicksort.close();
     bubblesort.close();
     mergesort.close();
+    insort.close();
 
     FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
-
 
 
     plot(gnuplot_fd, "qsort.txt", "Quick sort", "1" );
     plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
-
+    plot(gnuplot_fd, "insort.txt", "Insertion sort", "4" );
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
@@ -249,9 +287,11 @@ int main() {
     fprintf(gnuplot_fd, "All sorts");
     fprintf(gnuplot_fd, "\'\n");
     fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time\"\n");
+    fprintf(gnuplot_fd," \n set logscale x \n");
     fprintf(gnuplot_fd, "plot \"bsort.txt\" using 1:2 title \"Bubble sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"qsort.txt\" using 1:2 title \"Quick sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"msort.txt\" using 1:2 title \"Merge sort\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"insort.txt\" using 1:2 title \"Insertion sort\" with linespoints\n");
 
     fflush(gnuplot_fd);
 
