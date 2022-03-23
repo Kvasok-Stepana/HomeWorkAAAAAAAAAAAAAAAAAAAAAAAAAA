@@ -153,6 +153,24 @@ void insertionSort(int arr[], int n)
     }
 }
 
+void SelectionSort(int arr[], int n)
+{
+    int i, j, min_idx;
+
+    // One by one move boundary of unsorted subarray
+    for (i = 0; i < n-1; i++)
+    {
+        // Find the minimum element in unsorted array
+        min_idx = i;
+        for (j = i+1; j < n; j++)
+            if (arr[j] < arr[min_idx])
+                min_idx = j;
+
+        // Swap the found minimum element with the first element
+        swap(arr[min_idx], arr[i]);
+    }
+}
+
 
 void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
 {
@@ -185,6 +203,9 @@ int main() {
     std::ofstream bubblesort("bsort.txt", std::ios::out);
     std::ofstream mergesort("msort.txt", std::ios::out);
     std::ofstream insort("insort.txt", std::ios::out);
+    std::ofstream selectsort("selsort.txt", std::ios::out);
+
+
     for (int size = 16; size < 5000000  ; size <<= 1) {
 
         cout << "Sorting (" << i + 1 << " out of 19)" << endl;
@@ -240,7 +261,7 @@ int main() {
 
        }
 
-        if (1==1){
+        if (size < 150000){
             insort << size << "\t";
 
             new_arr(arr, size);
@@ -258,6 +279,23 @@ int main() {
 
         }
 
+        if (size < 100000){
+            selectsort << size << "\t";
+
+            new_arr(arr, size);
+
+            auto start = chrono::high_resolution_clock::now();
+            SelectionSort(arr, size );
+            auto end = chrono::high_resolution_clock::now();
+
+            chrono::duration<float> timeS = end - start;
+            selectsort << timeS.count() << "\n";
+
+            TestArray(arr, size, "selection_sort");
+
+            cout << "selsort - OK"<< endl;
+
+        }
 
 
 
@@ -272,6 +310,7 @@ int main() {
     bubblesort.close();
     mergesort.close();
     insort.close();
+    selectsort.close();
 
     FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
 
@@ -280,6 +319,7 @@ int main() {
     plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
     plot(gnuplot_fd, "insort.txt", "Insertion sort", "4" );
+    plot(gnuplot_fd, "selsort.txt", "Selection sort", "4" );
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
@@ -292,6 +332,7 @@ int main() {
     fprintf(gnuplot_fd, "replot \"qsort.txt\" using 1:2 title \"Quick sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"msort.txt\" using 1:2 title \"Merge sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"insort.txt\" using 1:2 title \"Insertion sort\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"selsort.txt\" using 1:2 title \"Selection sort\" with linespoints\n");
 
     fflush(gnuplot_fd);
 
