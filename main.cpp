@@ -9,7 +9,6 @@
 #include <ctime>
 #include <chrono>
 
-#pragma comment(linker, "/STACK:16777216")
 
 /*We had 2 standard libraries, 11 strings in for cycle,
  * 7 sorting algorithms, a memory half-full of arrays
@@ -47,21 +46,28 @@ void TestArray(int* Arr, int size, string sortname){
 
 
 
-void QuickSort (int *ar, int lo, int hi)
+void QuickSort (int *s_arr, int first, int last)
 {
-    if (lo < hi) {
-        int pivot = ar[hi];
-        int i = lo-1;
-        for (int j = lo; j < hi; ++j)
-            if (ar[j] <= pivot)
-                swap(ar[++i], ar[j]);
-
-        if (ar[hi] < ar[i+1])
-            swap(ar[i+1], ar[hi]);
-
-        int prt = i+1;
-        QuickSort(ar, lo, prt-1);
-        QuickSort(ar, prt+1, hi);
+    {
+        if (first < last)
+        {
+            int left = first, right = last, middle = s_arr[(left + right) / 2];
+            do
+            {
+                while (s_arr[left] < middle) left++;
+                while (s_arr[right] > middle) right--;
+                if (left <= right)
+                {
+                    int tmp = s_arr[left];
+                    s_arr[left] = s_arr[right];
+                    s_arr[right] = tmp;
+                    left++;
+                    right--;
+                }
+            } while (left <= right);
+            QuickSort(s_arr, first, right);
+            QuickSort(s_arr, left, last);
+        }
     }
 
 }
@@ -82,32 +88,12 @@ void BubbleSort (int* Arr,int Size)
     }
 }
 
-
-
-
-
-
-void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
-{
-
-
-    fprintf(gnuplot_fd, "set terminal windows ");
-    fprintf(gnuplot_fd, window_number);
-    fprintf(gnuplot_fd, "\nset title \'");
-    fprintf(gnuplot_fd, title);
-    fprintf(gnuplot_fd, "\'\n");
-    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time \"\n");
-    fprintf(gnuplot_fd, "plot \'");
-    fprintf(gnuplot_fd, filename);
-    fprintf(gnuplot_fd, "\' using 1:2 with linespoints \n");
-
-    fflush(gnuplot_fd);
-}
 void merge(int *array, int l, int m, int r) {
     int i, j, k, nl, nr;
     //size of left and right sub-arrays
     nl = m-l+1; nr = r-m;
-    int larr[nl], rarr[nr];
+    int* larr = new int [nl];
+    int* rarr = new int [nr];
     //fill left and right sub-arrays
     for(i = 0; i<nl; i++)
         larr[i] = array[l+i];
@@ -133,7 +119,11 @@ void merge(int *array, int l, int m, int r) {
         array[k] = rarr[j];
         j++; k++;
     }
+
+    delete[] larr;
+    delete[] rarr;
 }
+
 void mergeSort(int *array, int l, int r) {
     int m;
     if(l < r) {
@@ -145,16 +135,22 @@ void mergeSort(int *array, int l, int r) {
     }
 }
 
-
-
-void CallSort (int Num,int* Arr, int size, int i)
+void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
 {
 
 
+    fprintf(gnuplot_fd, "set terminal windows ");
+    fprintf(gnuplot_fd, window_number);
+    fprintf(gnuplot_fd, "\nset title \'");
+    fprintf(gnuplot_fd, title);
+    fprintf(gnuplot_fd, "\'\n");
+    fprintf(gnuplot_fd, "set xlabel \"Number of a elements\"\nset ylabel \"Time \"\n");
+    fprintf(gnuplot_fd, "plot \'");
+    fprintf(gnuplot_fd, filename);
+    fprintf(gnuplot_fd, "\' using 1:2 with linespoints \n");
+
+    fflush(gnuplot_fd);
 }
-
-
-
 
 
 int main() {
@@ -183,8 +179,8 @@ int main() {
 
         auto start = chrono::high_resolution_clock::now();
         QuickSort(arr, 0, size - 1);
-        auto end = chrono::high_resolution_clock::now()
-                ;
+        auto end = chrono::high_resolution_clock::now();
+
         chrono::duration<float> timeS = end - start;
         quicksort << timeS.count() << "\n";
 
@@ -199,13 +195,14 @@ int main() {
             BubbleSort(arr, size);
             auto end = chrono::high_resolution_clock::now();
             chrono::duration<float> timeS = end - start;
+
             bubblesort << timeS.count() << "\n";
             TestArray(arr, size, "bubble_sort");
 
             cout << "bsort - OK"<< endl;
         }
 
-        if (1 == 1){
+        if (size < 5000000){
             mergesort << size << "\t";
 
             new_arr(arr, size);
@@ -241,11 +238,10 @@ int main() {
 
 
 
-/*
     plot(gnuplot_fd, "qsort.txt", "Quick sort", "1" );
     plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
-*/
+
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
