@@ -206,9 +206,9 @@ int main() {
     std::ofstream selectsort("selsort.txt", std::ios::out);
 
 
-    for (int size = 16; size < 5000000  ; size <<= 1) {
+    for (int size = 1024 ; size < 5000000  ; size <<= 1) {
 
-        cout << "Sorting (" << i + 1 << " out of 19)" << endl;
+        cout << "Sorting (" << i + 1 << " out of 13)" << endl;
 
         arr = new int [size];
 
@@ -228,7 +228,7 @@ int main() {
 
         cout << "qsort - OK"<< endl;
 
-        if (size < 50000) {
+        if (size < 40000) {
             bubblesort << size << "\t";
             new_arr(arr, size);
             auto start = chrono::high_resolution_clock::now();
@@ -261,7 +261,7 @@ int main() {
 
        }
 
-        if (size < 150000){
+        if (size < 120000){
             insort << size << "\t";
 
             new_arr(arr, size);
