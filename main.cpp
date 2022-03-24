@@ -233,7 +233,7 @@ int main() {
 
 
 
-    for (int size = 1024 ; size < 5000000  ; size <<= 1) {
+    for (int size = 1000 ; i < 300  ; size += 1000 ) {
 
         cout << "Sorting (" << i + 1 << " out of 13)" << endl;
 
