@@ -210,26 +210,26 @@ int main() {
     int *arr ;
     int i=0;
 
+
+
     sortind[0] = QuickSort ;
     sortind[1] = BubbleSort;
     sortind[2] = mergeSort;
     sortind[3] = insertionSort;
     sortind[4] = SelectionSort;
 
-
     ofstream filesort[5];
 
-    filesort[0].open  ("qsort.txt");
-    filesort[1].open ("bsort.txt");
-    filesort[2].open ("msort.txt");
-    filesort[3].open ("insort.txt");
-    filesort[4].open ("selsort.txt");
-
-
-
+    filesort[0].open  ("qsort.txt",ios::out);
+    filesort[1].open ("bsort.txt",ios::out);
+    filesort[2].open ("msort.txt",ios::out);
+    filesort[3].open ("insort.txt",ios::out);
+    filesort[4].open ("selsort.txt",ios::out);
 
 
     string Nameofsort [5] = {"qsort","bsort","msort","insort","selsort"};
+
+    int stopsort[5]={0,0,0,0,0};
 
 
 
@@ -241,22 +241,27 @@ int main() {
 
 
         for  (int sn=0 ; sn<5 ; sn++){
+                if (stopsort[sn] == 0){
+                new_arr(arr, size);
 
-            new_arr(arr, size);
+                filesort[sn] << size << "\t";
 
-            filesort[sn] << size << "\t";
+                auto start = chrono::high_resolution_clock::now();
+                sortind[sn](arr, 0, size - 1);
+                auto end = chrono::high_resolution_clock::now();
 
-            float start = clock();
-            sortind[sn](arr,0, size-1);
-            float end = clock();
+                unsigned int time = chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
-            float time = end - start;
+                filesort[sn] << time << "\n";
 
-            filesort[sn] << time << "\n";
+                    if (time>1014041300){
+                        stopsort[sn]++;
+                    }
 
-            TestArray(arr, size, Nameofsort[sn] );
+                TestArray(arr, size, Nameofsort[sn]);
 
-            cout << Nameofsort[sn] << "-OK"<< endl;
+                cout << Nameofsort[sn] << "-OK" << endl;
+            }
         }
 
         delete[] arr;
@@ -275,7 +280,7 @@ int main() {
     plot(gnuplot_fd, "bsort.txt", "Bubble sort", "2" );
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
     plot(gnuplot_fd, "insort.txt", "Insertion sort", "4" );
-    plot(gnuplot_fd, "selsort.txt", "Selection sort", "4" );
+    plot(gnuplot_fd, "selsort.txt", "Selection sort", "5" );
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
