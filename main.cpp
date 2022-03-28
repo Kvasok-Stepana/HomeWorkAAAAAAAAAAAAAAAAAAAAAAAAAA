@@ -2,13 +2,12 @@
 #include <locale>
 #include <iostream>
 #include <cmath>
-#include <cstdlib>
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctime>
+#include <thread>
 #include <chrono>
-
+#include <string>
 
 /*We had 2 standard libraries, 11 strings in for cycle,
  * 7 sorting algorithms, a memory half-full of arrays
@@ -36,7 +35,7 @@ void new_arr(int* Arr,int Size)
 
 void TestArray(int* Arr, int size, string sortname){
     for (int i=0;i<size-1;i++){
-        if(Arr[i]>Arr[i++])
+        if(Arr[i]>Arr[i+1])
         {
             cout << "Erorre in" <<  sortname << "with size " << size << endl << "Array is not sorted"<< endl;
             system ("pause");
@@ -70,6 +69,30 @@ void QuickSort (int *s_arr, int first, int last)
     }
 }
 
+void QSortThread (int *s_arr, int first, int last){
+    int left = first, right = last, middle = s_arr[(left + right) / 2];
+    do
+    {
+        while (s_arr[left] < middle) left++;
+        while (s_arr[right] > middle) right--;
+        if (left <= right)
+        {
+            int tmp = s_arr[left];
+            s_arr[left] = s_arr[right];
+            s_arr[right] = tmp;
+            left++;
+            right--;
+        }
+    } while (left <= right);
+
+    std::thread streamA (QuickSort,s_arr,first,right);
+    std::thread streamB (QuickSort,s_arr,left, last);
+
+    streamA.join();
+    streamB.join();
+
+}
+
 void BubbleSort (int* Arr,int nul, int Size)
 {
     Size++;
@@ -78,7 +101,7 @@ void BubbleSort (int* Arr,int nul, int Size)
     {
         for (int j = i + 1   ; j < Size; j++)
         {
-            if (Arr[i] < Arr[j])
+            if (Arr[i] > Arr[j])
             {
                 swap(Arr[i],Arr[j]);
             }
@@ -193,7 +216,7 @@ void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char*
     fflush(gnuplot_fd);
 }
 
-void (*sortind [5])(int*, int, int) ;
+void (*sortind [6])(int*, int, int) ;
 
 
 
@@ -217,30 +240,32 @@ int main() {
     sortind[2] = mergeSort;
     sortind[3] = insertionSort;
     sortind[4] = SelectionSort;
+    sortind[5] = QSortThread;
 
-    ofstream filesort[5];
+    ofstream filesort[6];
 
     filesort[0].open  ("qsort.txt",ios::out);
     filesort[1].open ("bsort.txt",ios::out);
     filesort[2].open ("msort.txt",ios::out);
     filesort[3].open ("insort.txt",ios::out);
     filesort[4].open ("selsort.txt",ios::out);
+    filesort[5].open ("qsortthread.txt",ios::out);
 
 
-    string Nameofsort [5] = {"qsort","bsort","msort","insort","selsort"};
+    string Nameofsort [6] = {"qsort","bsort","msort","insort","selsort","qsortthread"};
 
-    int stopsort[5]={0,0,0,0,0};
+    int stopsort[6]={0,0,0,0,0,0};
 
 
 
     for (int size = 1000 ; i < 300  ; size += 1000 ) {
 
-        cout << "Sorting (" << i + 1 << " out of 13)" << endl;
+        cout << "Sorting (" << i + 1 << " out of 300)" << endl;
 
         arr = new int [size];
 
 
-        for  (int sn=0 ; sn<5 ; sn++){
+        for  (int sn=0 ; sn<6 ; sn++){
                 if (stopsort[sn] == 0){
                 new_arr(arr, size);
 
@@ -257,6 +282,8 @@ int main() {
                     if (time>1014041300){
                         stopsort[sn]++;
                     }
+
+
 
                 TestArray(arr, size, Nameofsort[sn]);
 
@@ -281,6 +308,7 @@ int main() {
     plot(gnuplot_fd, "msort.txt", "Merge sort", "3" );
     plot(gnuplot_fd, "insort.txt", "Insertion sort", "4" );
     plot(gnuplot_fd, "selsort.txt", "Selection sort", "5" );
+    plot(gnuplot_fd, "qsortthread.txt", "Quick sort multithreaded", "6" );
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
@@ -294,6 +322,7 @@ int main() {
     fprintf(gnuplot_fd, "replot \"msort.txt\" using 1:2 title \"Merge sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"insort.txt\" using 1:2 title \"Insertion sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"selsort.txt\" using 1:2 title \"Selection sort\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"qsortthread.txt\" using 1:2 title \"Quick sort multithreaded\" with linespoints\n");
 
     fflush(gnuplot_fd);
 
