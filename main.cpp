@@ -280,16 +280,15 @@ int main() {
     int stopsort[8]={0,0,0,0,0,0,0,0};
 
 
+    for (int size = 1024 ; size < 5000000  ; size<<=1) {
 
-    for (int size = 1000 ; i < 250  ; size += 1000 ) {
-
-        cout << "Sorting (" << i + 1 << " out of 300)" << endl;
+        cout << "Sorting (" << i + 1 << " out of 13)" << endl;
 
         arr = new int [size];
 
 
         for  (int sn=0 ; sn<8 ; sn++){
-                if (stopsort[sn] == 0){
+            if (stopsort[sn] == 0){
                 new_arr(arr, size);
 
                 filesort[sn] << size << "\t";
@@ -298,13 +297,14 @@ int main() {
                 sortind[sn](arr, 0, size - 1);
                 auto end = chrono::high_resolution_clock::now();
 
+
                 unsigned int time = chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
                 filesort[sn] << time << "\n";
 
-                    if (time>1014041300){
-                        stopsort[sn]++;
-                    }
+                if (time>1014041300){
+                    stopsort[sn]++;
+                }
 
                 TestArray(arr, size, Nameofsort[sn]);
 
@@ -312,13 +312,14 @@ int main() {
             }
         }
 
+
         delete[] arr;
         i++;
     }
 
     cout<< "Sorting finished"<< endl;
 
-    for (int i =0; i<7 ; i++)
+    for (int i =0; i<8 ; i++)
         filesort[i].close();
 
     FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
@@ -330,6 +331,8 @@ int main() {
     plot(gnuplot_fd, "insort.txt", "Insertion sort", "4" );
     plot(gnuplot_fd, "selsort.txt", "Selection sort", "5" );
     plot(gnuplot_fd, "qsortthread.txt", "Quick sort multithreaded", "6" );
+    plot(gnuplot_fd, "brsort.txt", "Brick sort", "7" );
+    plot(gnuplot_fd, "gnsort.txt", "Gnome sort", "8" );
 
     fprintf(gnuplot_fd, "set terminal windows ");
     fprintf(gnuplot_fd, "0");
@@ -345,12 +348,9 @@ int main() {
     fprintf(gnuplot_fd, "replot \"selsort.txt\" using 1:2 title \"Selection sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"qsortthread.txt\" using 1:2 title \"Quick sort multithreaded\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"brsort.txt\" using 1:2 title \"Brick sort\" with linespoints\n");
-
-
+    fprintf(gnuplot_fd, "replot \"gnsort.txt\" using 1:2 title \"Gnome sort\" with linespoints\n");
 
     fflush(gnuplot_fd);
-
-
 
 
     system ("pause");
