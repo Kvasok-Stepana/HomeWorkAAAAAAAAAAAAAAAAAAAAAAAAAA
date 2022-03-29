@@ -37,7 +37,8 @@ void TestArray(int* Arr, int size, string sortname){
     for (int i=0;i<size-1;i++){
         if(Arr[i]>Arr[i+1])
         {
-            cout << "Erorre in" <<  sortname << "with size " << size << endl << "Array is not sorted"<< endl;
+            cout<< i+1 << endl;
+            cout << "Erorre in " <<  sortname << " with size " << size << endl << "Array is not sorted"<< endl;
             system ("pause");
         }
     }
@@ -45,48 +46,48 @@ void TestArray(int* Arr, int size, string sortname){
 
 
 
-void QuickSort (int *s_arr, int first, int last)
+void QuickSort (int *Arr, int first, int last)
 {
 
     if (first < last)
     {
-        int left = first, right = last, middle = s_arr[(left + right) / 2];
+        int left = first, right = last, middle = Arr[(left + right) / 2];
         do
         {
-            while (s_arr[left] < middle) left++;
-            while (s_arr[right] > middle) right--;
+            while (Arr[left] < middle) left++;
+            while (Arr[right] > middle) right--;
             if (left <= right)
             {
-                int tmp = s_arr[left];
-                s_arr[left] = s_arr[right];
-                s_arr[right] = tmp;
+                int tmp = Arr[left];
+                Arr[left] = Arr[right];
+                Arr[right] = tmp;
                 left++;
                 right--;
             }
         } while (left <= right);
-        QuickSort(s_arr, first, right);
-        QuickSort(s_arr, left, last);
+        QuickSort(Arr, first, right);
+        QuickSort(Arr, left, last);
     }
 }
 
-void QSortThread (int *s_arr, int first, int last){
-    int left = first, right = last, middle = s_arr[(left + right) / 2];
+void QSortThread (int *Arr, int first, int last){
+    int left = first, right = last, middle = Arr[(left + right) / 2];
     do
     {
-        while (s_arr[left] < middle) left++;
-        while (s_arr[right] > middle) right--;
+        while (Arr[left] < middle) left++;
+        while (Arr[right] > middle) right--;
         if (left <= right)
         {
-            int tmp = s_arr[left];
-            s_arr[left] = s_arr[right];
-            s_arr[right] = tmp;
+            int tmp = Arr[left];
+            Arr[left] = Arr[right];
+            Arr[right] = tmp;
             left++;
             right--;
         }
     } while (left <= right);
 
-    std::thread streamA (QuickSort,s_arr,first,right);
-    std::thread streamB (QuickSort,s_arr,left, last);
+    thread streamA (QuickSort,Arr,first,right);
+    thread streamB (QuickSort,Arr,left, last);
 
     streamA.join();
     streamB.join();
@@ -194,9 +195,35 @@ void SelectionSort(int* arr,int nul, int n)
     }
 }
 
+void BrickSort (int* arr,int nul, int size){
+    size++;
+    for (int i = 0; i < size; i++) {
+        // (i % 2) ? 0 : 1 возвращает 1, если i четное, 0, если i не четное
+        for (int j = (i % 2) ? 0 : 1; j + 1 < size; j += 2) {
+            if (arr[j] > arr[j + 1]) {
+                std::swap(arr[j], arr[j + 1]);
+            }
+        }
+    }
+}
 
+void GnomeSort(int* arr,int nul, int Size){
+    Size++;
 
-
+    int i = 0;
+    while (i < Size)
+    {
+        if (i == 0 || arr[i - 1] <= arr[i])
+            ++i;
+        else
+        {
+            int tmp = arr[i];
+            arr[i] = arr[i - 1];
+            arr[i - 1] = tmp;
+            --i;
+        }
+    }
+}
 
 
 void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char* window_number)
@@ -216,12 +243,7 @@ void plot(FILE* gnuplot_fd, const char* filename, const char* title, const char*
     fflush(gnuplot_fd);
 }
 
-void (*sortind [6])(int*, int, int) ;
-
-
-
-
-
+void (*sortind [8])(int*, int, int) ;
 
 
 
@@ -233,16 +255,16 @@ int main() {
     int *arr ;
     int i=0;
 
-
-
     sortind[0] = QuickSort ;
     sortind[1] = BubbleSort;
     sortind[2] = mergeSort;
     sortind[3] = insertionSort;
     sortind[4] = SelectionSort;
     sortind[5] = QSortThread;
+    sortind[6] = BrickSort;
+    sortind[7] = GnomeSort;
 
-    ofstream filesort[6];
+    ofstream filesort[8];
 
     filesort[0].open  ("qsort.txt",ios::out);
     filesort[1].open ("bsort.txt",ios::out);
@@ -250,22 +272,23 @@ int main() {
     filesort[3].open ("insort.txt",ios::out);
     filesort[4].open ("selsort.txt",ios::out);
     filesort[5].open ("qsortthread.txt",ios::out);
+    filesort[6].open ("brsort.txt",ios::out);
+    filesort[7].open ("gnsort.txt",ios::out);
+
+    string Nameofsort [8] = {"qsort","bsort","msort","insort","selsort","qsortthread","brsort","gnsort"};
+
+    int stopsort[8]={0,0,0,0,0,0,0,0};
 
 
-    string Nameofsort [6] = {"qsort","bsort","msort","insort","selsort","qsortthread"};
 
-    int stopsort[6]={0,0,0,0,0,0};
-
-
-
-    for (int size = 1000 ; i < 300  ; size += 1000 ) {
+    for (int size = 1000 ; i < 250  ; size += 1000 ) {
 
         cout << "Sorting (" << i + 1 << " out of 300)" << endl;
 
         arr = new int [size];
 
 
-        for  (int sn=0 ; sn<6 ; sn++){
+        for  (int sn=0 ; sn<8 ; sn++){
                 if (stopsort[sn] == 0){
                 new_arr(arr, size);
 
@@ -283,8 +306,6 @@ int main() {
                         stopsort[sn]++;
                     }
 
-
-
                 TestArray(arr, size, Nameofsort[sn]);
 
                 cout << Nameofsort[sn] << "-OK" << endl;
@@ -297,7 +318,7 @@ int main() {
 
     cout<< "Sorting finished"<< endl;
 
-    for (int i =0; i<5 ; i++)
+    for (int i =0; i<7 ; i++)
         filesort[i].close();
 
     FILE* gnuplot_fd = popen ("gnuplot\\bin\\gnuplot", "w") ;
@@ -323,6 +344,9 @@ int main() {
     fprintf(gnuplot_fd, "replot \"insort.txt\" using 1:2 title \"Insertion sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"selsort.txt\" using 1:2 title \"Selection sort\" with linespoints\n");
     fprintf(gnuplot_fd, "replot \"qsortthread.txt\" using 1:2 title \"Quick sort multithreaded\" with linespoints\n");
+    fprintf(gnuplot_fd, "replot \"brsort.txt\" using 1:2 title \"Brick sort\" with linespoints\n");
+
+
 
     fflush(gnuplot_fd);
 
