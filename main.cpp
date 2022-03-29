@@ -279,10 +279,11 @@ int main() {
 
     int stopsort[8]={0,0,0,0,0,0,0,0};
 
+    int size = 1000;
 
-    for (int size = 1024 ; size < 5000000  ; size<<=1) {
+    for (int i = 0 ; i < 56 ; i++) {
 
-        cout << "Sorting (" << i + 1 << " out of 13)" << endl;
+        cout << "Sorting (" << i + 1 << " out of 56)" << endl;
 
         arr = new int [size];
 
@@ -297,12 +298,11 @@ int main() {
                 sortind[sn](arr, 0, size - 1);
                 auto end = chrono::high_resolution_clock::now();
 
-
                 unsigned int time = chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
 
                 filesort[sn] << time << "\n";
 
-                if (time>1014041300){
+                if (time>1000000000){
                     stopsort[sn]++;
                 }
 
@@ -312,9 +312,14 @@ int main() {
             }
         }
 
+        if (size < 50000)
+            size += 1000;
+        else
+            size *=2;
+
 
         delete[] arr;
-        i++;
+
     }
 
     cout<< "Sorting finished"<< endl;
