@@ -1,7 +1,4 @@
-#include <Windows.h>
-#include <locale>
 #include <iostream>
-#include <cmath>
 #include <fstream>
 #include <stdlib.h>
 #include <stdio.h>
